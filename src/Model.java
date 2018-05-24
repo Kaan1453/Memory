@@ -4,8 +4,6 @@ import java.util.List;
 
 public class Model {
 
-	private int x;
-	private int y;
 	private int total = 8;
 	private int com[][];
 	private int counter;
@@ -20,8 +18,6 @@ public class Model {
 		for (int i = 0; i < total; i++) {
 			pic.add(i);
 			pic.add(i);
-			
-
 		}
 		Collections.shuffle(pic);
 		for (int i = 0; i < x.length; i++) {
@@ -29,7 +25,6 @@ public class Model {
 				x[i][a] = pic.remove(0);
 				System.out.println(x[i][a]);
 			}
-			
 
 		}
 		return x;
@@ -37,8 +32,6 @@ public class Model {
 
 	public void incrementCounter() {
 		this.counter++;
-		System.out.println(this.counter);
-
 	}
 
 	public boolean isFinished() {
@@ -51,14 +44,6 @@ public class Model {
 
 	public void setNumbers(int x[][]) {
 		this.com = x;
-	}
-
-	public int getY() {
-		return this.y;
-	}
-
-	public int getX() {
-		return this.x;
 	}
 
 }

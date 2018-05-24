@@ -20,19 +20,16 @@ public class Controller extends MouseAdapter {
 
 	public void mouseReleased(MouseEvent e) {
 		if (firstClick) {
-			this.view.setImage1(this.x, this.y);
-			firstClick = false;
-			
-
+			System.out.println("First CLick");
+			if (this.view.setImage1(this.x, this.y))
+				firstClick = false;
 		} else {
-			System.out.println("falsch");
+			System.out.println("Second Click");
 			try {
 				if (this.view.setImage2(this.x, this.y)) {
 					firstClick = true;
-					this.view.deleteImages(this.x, this.y);
 				}
 			} catch (InterruptedException e1) {
-				
 				e1.printStackTrace();
 			}
 		}

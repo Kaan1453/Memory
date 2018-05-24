@@ -23,15 +23,14 @@ public class View extends JFrame {
 	private static final long serialVersionUID = 1859028356359840318L;
 	private JLabel[][] labels;
 	public Model model;
-	private boolean play;
 	private JPanel panel;
-	private boolean firstPlay;
 	private ImageIcon[] icon = new ImageIcon[8];
 	private int compareNumber;
 	private int previousX;
 	private int previousY;
-	private List<JLabel> jList = new ArrayList<>();
+	private List<JLabel> blackList = new ArrayList<>();
 	private Timer timer;
+	private ThreadWait t1;
 
 	/**
 	 * Konstruktor des Views
@@ -51,8 +50,6 @@ public class View extends JFrame {
 		this.panel.setBackground(Color.BLACK);
 
 		this.add(panel);
-		this.firstPlay = true;
-
 		defineLabels();
 		addLabels();
 		setIcons();
@@ -76,12 +73,6 @@ public class View extends JFrame {
 	}
 
 	public void startOperation() {
-		this.play = true;
-		if (this.firstPlay == false) {
-			this.model.setNumbers(this.model.mashUp(new int[this.model.getY()][this.model.getX()]));
-			defineLabels();
-			addLabels();
-		}
 		timer = new Timer(100, trigger -> {
 			if (this.model.isFinished()) {
 				JOptionPane.showMessageDialog(null, "Gewonnen");
@@ -134,12 +125,15 @@ public class View extends JFrame {
 	 * @param x
 	 * @param y
 	 */
-	public void setImage1(int x, int y) {
-		this.previousX = x;
-		this.previousY = y;
-		this.compareNumber = this.model.getNumber(x, y);
-		this.labels[x][y].setIcon(this.icon[compareNumber]);
-
+	public boolean setImage1(int x, int y) {
+		if (!this.blackList.contains(this.labels[x][y])) {
+			this.previousX = x;
+			this.previousY = y;
+			this.compareNumber = this.model.getNumber(x, y);
+			this.labels[x][y].setIcon(this.icon[compareNumber]);
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -150,41 +144,28 @@ public class View extends JFrame {
 	 * @throws InterruptedException
 	 */
 	public boolean setImage2(int x, int y) throws InterruptedException {
-		if (!(this.previousX == x) && !(this.previousY == y)) {
-			int dummy = this.model.getNumber(x, y);
-			if (this.compareNumber == dummy) {
-				this.model.incrementCounter();
-				this.labels[x][y].setIcon(this.icon[dummy]);
-
-			} else {
-				this.labels[x][y].setIcon(this.icon[dummy]);
-				SwingUtilities.invokeLater(new Runnable() {
-					public void run() {
-						try {
-							Thread.sleep(5000);
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-					}
-				});
-
-				System.out.println("Löschen");
-
+		if (!this.blackList.contains(this.labels[x][y])) {
+			if (x != this.previousX || y != this.previousY) {
+				int dummy = this.model.getNumber(x, y);
+				if (this.compareNumber == dummy) {
+					this.model.incrementCounter();
+					this.labels[x][y].setIcon(this.icon[dummy]);
+					this.blackList.add(this.labels[this.previousX][this.previousY]);
+					this.blackList.add(this.labels[x][y]);
+				} else {
+					this.labels[x][y].setIcon(this.icon[dummy]);
+					this.t1 = new ThreadWait(this, x, y);
+					t1.start();
+				}
+				return true;
 			}
-			return true;
-
 		}
 		return false;
-
 	}
-	
-	public void deleteImages(int x, int y) {
 
+	public void deleteImages(int x, int y) {
 		this.labels[this.previousX][this.previousY].setIcon(null);
 		this.labels[x][y].setIcon(null);
-	}
-	public boolean getPlay() {
-		return this.play;
 	}
 
 }
